@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<job name="pro.job" maxFilesPerProcess="1" fileListSyntax="paths" copyInputLocally="false">
+    <command>
+        set mudstfile=$INPUTFILE0
+        stardev
+	/usr/bin/time root4star -b -q readMudst_upcjet.C\(\"$mudstfile\",\"$FILEBASENAME.mudst.root\"\);
+    </command>
+    <input URL="filelist:&filelist;" />
+    <stdout URL="file:&outdir;/log/$FILEBASENAME.log" />
+    <stderr URL="file:&outdir;/err/$FILEBASENAME.err" />
+    <output fromScratch="$FILEBASENAME.mudst.root" toURL="file:&outdir;/" />
+    <SandBox>
+        <Package>
+            <File>file:./readMudst_upcjet.C</File>
+            <File>file:./.sl73_gcc485</File>
+        </Package>
+    </SandBox>
+    <Generator>
+        <Location>./&scriptdir;</Location>
+    </Generator>
+</job>
