@@ -87,20 +87,26 @@ void readMudst_upcjet(
     BBCW = dsm & 0x4;
 
     //veto ZDC and EEMC
-    StZdcTriggerDetector &muZdc = StMuDst::event()->zdcTriggerDetector();
-    StEmcTriggerDetector &muemc = StMuDst::event()->emcTriggerDetector();
+    // StZdcTriggerDetector &muZdc = StMuDst::event()->zdcTriggerDetector();
+    // StEmcTriggerDetector &muemc = StMuDst::event()->emcTriggerDetector();
 
     //check BBC, EPD, VPD
     StBbcTriggerDetector &muBbc = StMuDst::event()->bbcTriggerDetector();
     StMuPrimaryVertex *vertex = StMuDst::primaryVertex();
     StEpdGeom * mEpdGeom = new StEpdGeom();
 
+    //vertex selections:
+    if(!vertex) continue;
+    TVector3 pRcVx(vertex->position().x(), vertex->position().y(), vertex->position().z());
+    //Tof or BEMC match
+    if(vertex->nBTOFMatch()<1 && vertex->nBEMCMatch()<1)continue;
+
     //trigger decisions
     mMuDst = muDstMaker->muDst();
     StMuEvent *mMuEvent = mMuDst->event();
     //loop over triggers
     int trig_index=-1;
-    for(int i=0;i<num_trgs;i++){
+    for(int i=5;i<6;i++){
       if( mMuEvent->triggerIdCollection().nominal().isTrigger(commTriggerID[i]) ) trig_index=i;
     }
     if(trig_index<0) continue; //protection
@@ -162,12 +168,6 @@ void readMudst_upcjet(
       vpdadc_w = vpdadc_w + trgdata->vpdADC(1, ipmt);
     }
     vpdadc[trig_index][direction_index]->Fill(vpdadc_e, vpdadc_w);
-
-    //vertex selections:
-    if(!vertex) continue;
-    TVector3 pRcVx(vertex->position().x(), vertex->position().y(), vertex->position().z());
-    //Tof or BEMC match
-    if(vertex->nBTOFMatch()<1 && vertex->nBEMCMatch()<1)continue;
 
   /*********EPD ************/
     int nhit = StMuDst::numberOfEpdHit();
