@@ -1,4 +1,4 @@
-const unsigned long nevents = 400;
+const unsigned long nevents = 40000000;
 int commTriggerID[]={2,3,16,17,18,19,20};
 int prodTriggerID[]={900501,900502,900503,900504,900505,900506,900507};
 
