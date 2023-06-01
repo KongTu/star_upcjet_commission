@@ -37,7 +37,7 @@ void readMudst_upcjet(
 
   TFile *fout = new TFile(outfile, "recreate");
   
-  const int num_trgs = 7;
+  const int num_trgs = sizeof(commTriggerID) / sizeof(int);
   const int direction = 2;
   
   TH1F* hntrk[num_trgs][direction];
@@ -65,13 +65,13 @@ void readMudst_upcjet(
       //eemc
       eemc[i][j] = new TH1F(Form("eemc_%d_%d",i,j),"; EEMC ADC;counts",256,0,25000);
       //zdc ADC
-      TH2F *zdcadc[i][j] = new TH2F(Form("zdcadc_%d_%d",i,j),";ZDCE ADC; ZDCW ADC;counts",256,0,2000,256,0,2000);
+      zdcadc[i][j] = new TH2F(Form("zdcadc_%d_%d",i,j),";ZDCE ADC; ZDCW ADC;counts",256,0,2000,256,0,2000);
       //bbc ADC
-      TH2F *bbcadc[i][j] = new TH2F(Form("bbcadc_%d_%d",i,j),";BBCE ADC; BBCW ADC;counts",256,0,25000,256,0,25000);
+      bbcadc[i][j] = new TH2F(Form("bbcadc_%d_%d",i,j),";BBCE ADC; BBCW ADC;counts",256,0,25000,256,0,25000);
       //vpd adc
-      TH2F *vpdadc[i][j] = new TH2F(Form("vpdadc_%d_%d",i,j),";VPDE ADC; VPDW ADC;counts",256,0,4000,256,0,4000);
+      vpdadc[i][j] = new TH2F(Form("vpdadc_%d_%d",i,j),";VPDE ADC; VPDW ADC;counts",256,0,4000,256,0,4000);
       //epd adc
-      TH2F *epdadc[i][j] = new TH2F(Form("epdadc_%d_%d",i,j),";EPDE ADC; EPDW ADC;counts",256,0,40000,256,0,40000);
+      epdadc[i][j] = new TH2F(Form("epdadc_%d_%d",i,j),";EPDE ADC; EPDW ADC;counts",256,0,40000,256,0,40000);
     }
   }
 
