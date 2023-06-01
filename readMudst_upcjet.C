@@ -1,7 +1,6 @@
-const unsigned long nevents = 4000000;
-
+const unsigned long nevents = 400;
 int commTriggerID[]={2,3,16,17,18,19,20};
-int prodTriggerID[]={};
+int prodTriggerID[]={900501,900502,900503,900504,900505,900506,900507};
 
 void readMudst_upcjet(
 	       const char* mudstfile = "/star/data12/reco/./production_AuAu_2023/ReversedFullField/dev/2023/148/24148005/st_upcjet_24148005_raw_0000009.MuDst.root", 
