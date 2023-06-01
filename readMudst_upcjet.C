@@ -37,7 +37,7 @@ void readMudst_upcjet(
 
   TFile *fout = new TFile(outfile, "recreate");
   
-  const int num_trgs = sizeof(commTriggerID) / sizeof(int);
+  const int num_trgs = 7;
   const int direction = 2;
   
   TH1F* hntrk[num_trgs][direction];
