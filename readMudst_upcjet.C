@@ -235,8 +235,8 @@ void readMudst_upcjet(
       double subleading_eta=0.;
       double subleading_phi=0.;
 
-      TLorentzVector p1,p2,rho;
-      vector<TLorentzVector> p1c,p2c;
+      TLorentzVector p1; TLorentzVector p2,TLorentzVector rho;
+      vector<TLorentzVector> p1c; vector<TLorentzVector> p2c;
 
       for(int iTrack = 0; iTrack < nprim; iTrack++){
         const StMuTrack* muTrack = StMuDst::primaryTracks(iTrack);
