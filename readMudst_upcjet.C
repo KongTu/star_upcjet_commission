@@ -1,4 +1,4 @@
-const unsigned long nevents = 40000000;
+const unsigned long nevents = 400;
 int commTriggerID[]={2,3,16,17,18,19,20};
 int prodTriggerID[]={900501,900502,900503,900504,900505,900506,900507};
 
@@ -40,13 +40,16 @@ void readMudst_upcjet(
   const int num_trgs = 7;
   const int direction = 2;
   
-  TH1F* hntrk[num_trgs][direction];
+  TH1F *hntrk[num_trgs][direction];
   TH1F *hvtxz[num_trgs][direction];
-  TH1F* htrketa[num_trgs][direction];
+  TH1F *htrketa[num_trgs][direction];
   TH1F *epdeta[num_trgs][direction];
   TH1F *zdcadc_east[num_trgs][direction];
   TH1F *zdcadc_west[num_trgs][direction];
   TH1F *eemc[num_trgs][direction];
+
+  TH1F *h_rho_mass[num_trgs][direction];
+  TH1F *h_rho_pt[num_trgs][direction];
   
   TH2F *zdcadc[num_trgs][direction];
   TH2F *bbcadc[num_trgs][direction];
@@ -56,6 +59,7 @@ void readMudst_upcjet(
   TH2F *pt2D[num_trgs][direction];
   TH2F *eta2D[num_trgs][direction];
   TH2F *phi2D[num_trgs][direction];
+
 
   for(int i=0;i<num_trgs;i++){
     for(int j=0;j<direction;j++){
@@ -71,6 +75,10 @@ void readMudst_upcjet(
       zdcadc_west[i][j] = new TH1F(Form("zdcadc_west_%d_%d",i,j),";ZDCW ADC;counts",256,0,2000);
       //eemc
       eemc[i][j] = new TH1F(Form("eemc_%d_%d",i,j),"; EEMC ADC;counts",256,0,25000);
+      
+      h_rho_mass[i][j] = new TH1F(Form("h_rho_mass_%d_%d",i,j),"; mass;counts",400,0,3.5);
+      h_rho_pt[i][j] = new TH1F(Form("h_rho_pt_%d_%d",i,j),"; p_{T} (GeV/c);counts",400,0,2);
+
       //zdc ADC
       zdcadc[i][j] = new TH2F(Form("zdcadc_%d_%d",i,j),";ZDCE ADC; ZDCW ADC;counts",256,0,2000,256,0,2000);
       //bbc ADC
@@ -227,6 +235,9 @@ void readMudst_upcjet(
       double subleading_eta=0.;
       double subleading_phi=0.;
 
+      TLorentzVector p1,p2,rho;
+      vector<TLorentzVector> p1c,p2c;
+
       for(int iTrack = 0; iTrack < nprim; iTrack++){
         const StMuTrack* muTrack = StMuDst::primaryTracks(iTrack);
         int id = muTrack->id();
@@ -238,9 +249,20 @@ void readMudst_upcjet(
         float pt = muTrack->pt();
         float phi= muTrack->phi();
         double eta = muTrack->eta();
+        int charge=muTrack->charge();
 
         if(pt<0.2)continue;
         if(nhits<15)continue;
+
+        if(charge>0) {
+          p1.SetPtEtaPhiM(pt,eta,phi,0.13957);
+          p1c.push_back(p1);
+        }
+
+        if(charge<0) {
+          p2.SetPtEtaPhiM(pt,eta,phi,0.13957);
+          p2c.push_back(p2);
+        }
 
         if(pt>leading_pt){
           subleading_pt=leading_pt;
@@ -251,11 +273,6 @@ void readMudst_upcjet(
           leading_eta=eta;
           leading_phi=phi;
         }
-        else if(pt>subleading_pt){
-          subleading_pt=pt;
-          subleading_eta=eta;
-          subleading_phi=phi;
-        }
         htrketa[trig_index][direction_index]->Fill(eta);
         numtrk++;
       }
@@ -264,6 +281,19 @@ void readMudst_upcjet(
       pt2D[trig_index][direction_index]->Fill(leading_pt, subleading_pt);
       eta2D[trig_index][direction_index]->Fill(leading_eta, subleading_eta);
       phi2D[trig_index][direction_index]->Fill(leading_phi, subleading_phi);
+    
+      for(unsigned i=0;i<p1c.size();i++){
+        for(unsigned j=0;i<p2c.size();j++){
+          rho = p1c[i]+p2c[j];
+          double mass=rho.M();
+          double pt=rho.Pt();
+          h_rho_mass[trig_index][direction_index]->Fill(mass);
+          h_rho_pt[trig_index][direction_index]->Fill(mass);
+
+        }
+      }
+      p1c.clear();
+      p2c.clear();
     }
   }
 
