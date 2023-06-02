@@ -111,8 +111,6 @@ void readMudst_upcjet(
     //vertex selections:
     if(!vertex) continue;
     TVector3 pRcVx(vertex->position().x(), vertex->position().y(), vertex->position().z());
-      hvtxz[trig_index][direction_index]->Fill(vertex->position().z());
-    if(TMath::Abs(vertex->position().z())>100) continue;
     //Tof or BEMC match
     if(vertex->nBTOFMatch()<1 && vertex->nBEMCMatch()<1)continue;
 
@@ -262,6 +260,7 @@ void readMudst_upcjet(
         numtrk++;
       }
       hntrk[trig_index][direction_index]->Fill(numtrk);
+      hvtxz[trig_index][direction_index]->Fill(vertex->position().z());
       pt2D[trig_index][direction_index]->Fill(leading_pt, subleading_pt);
       eta2D[trig_index][direction_index]->Fill(leading_eta, subleading_eta);
       phi2D[trig_index][direction_index]->Fill(leading_phi, subleading_phi);
