@@ -282,9 +282,9 @@ void readMudst_upcjet(
       eta2D[trig_index][direction_index]->Fill(leading_eta, subleading_eta);
       phi2D[trig_index][direction_index]->Fill(leading_phi, subleading_phi);
     
-      for(unsigned i=0;i<p1c.size();i++){
-        for(unsigned j=0;i<p2c.size();j++){
-          rho = p1c[i]+p2c[j];
+      for(unsigned ip=0;ip<p1c.size();ip++){
+        for(unsigned jn=0;jn<p2c.size();jn++){
+          rho = p1c[ip]+p2c[jn];
           double mass=rho.M();
           double pt=rho.Pt();
           h_rho_mass[trig_index][direction_index]->Fill(mass);
