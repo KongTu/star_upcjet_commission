@@ -289,9 +289,9 @@ void readMudst_upcjet(
         for(int jn=0;jn<p2c.size();jn++){
           rho = p1c[ip]+p2c[jn];
           double mass=rho.M();
-          double pt=rho.Pt();
+          double rhopt=rho.Pt();
           h_rho_mass[trig_index][direction_index]->Fill(mass);
-          h_rho_pt[trig_index][direction_index]->Fill(pt);
+          h_rho_pt[trig_index][direction_index]->Fill(rhopt);
 
         }
       }
