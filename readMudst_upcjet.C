@@ -1,4 +1,4 @@
-const unsigned long nevents = 400;
+const unsigned long nevents = 40000000;
 int commTriggerID[]={2,3,16,17,18,19,20};
 int prodTriggerID[]={900501,900502,900503,900504,900505,900506,900507};
 
@@ -99,6 +99,21 @@ void readMudst_upcjet(
     BBCE = dsm & 0x2;
     BBCW = dsm & 0x4;
 
+    /************ZDC ADC***************/ 
+    /******east = 0, west =1**********/
+    int mNZdcPmt = 3;
+    double zdcadc_e = 0;
+    double zdcadc_w = 0;
+    for (Int_t ipmt=1; ipmt<=mNZdcPmt; ipmt++) {
+        zdcadc_e = zdcadc_e + trgdata->zdcADC(0, ipmt); 
+        zdcadc_w = zdcadc_w + trgdata->zdcADC(1, ipmt);
+    }
+    // ZDC reqirement 1nXn
+    int ZDCW=0;
+    int ZDCE=0;
+    if(zdcadc_w >= 250){ZDCW=1;}
+    if(zdcadc_e >= 250){ZDCE=1;}
+
     //veto ZDC and EEMC
     // StZdcTriggerDetector &muZdc = StMuDst::event()->zdcTriggerDetector();
     // StEmcTriggerDetector &muemc = StMuDst::event()->emcTriggerDetector();
@@ -123,21 +138,6 @@ void readMudst_upcjet(
       int trig_index=-1;
       if( mMuEvent->triggerIdCollection().nominal().isTrigger(commTriggerID[i]) ) trig_index=i;
       if(trig_index<0) continue; //protection
-
-      /************ZDC ADC***************/ 
-      /******east = 0, west =1**********/
-      int mNZdcPmt = 3;
-      double zdcadc_e = 0;
-      double zdcadc_w = 0;
-      for (Int_t ipmt=1; ipmt<=mNZdcPmt; ipmt++) {
-          zdcadc_e = zdcadc_e + trgdata->zdcADC(0, ipmt); 
-          zdcadc_w = zdcadc_w + trgdata->zdcADC(1, ipmt);
-      }
-      // ZDC reqirement 1nXn
-      int ZDCW=0;
-      int ZDCE=0;
-      if(zdcadc_w >= 250){ZDCW=1;}
-      if(zdcadc_e >= 250){ZDCE=1;}
 
       //1) now decide direction based on BBC first.
       int direction_index=-1;
