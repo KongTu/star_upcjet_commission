@@ -1,4 +1,5 @@
 #include "TLorentzVector.h"
+#include <vector>
 const unsigned long nevents = 400;
 int commTriggerID[]={2,3,16,17,18,19,20};
 int prodTriggerID[]={900501,900502,900503,900504,900505,900506,900507};
@@ -237,7 +238,8 @@ void readMudst_upcjet(
       double subleading_phi=0.;
 
       TLorentzVector p1(0,0,0,0); TLorentzVector p2(0,0,0,0); TLorentzVector rho(0,0,0,0);
-      vector<TLorentzVector> p1c; vector<TLorentzVector> p2c;
+      vector<TLorentzVector> p1c; 
+      vector<TLorentzVector> p2c;
 
       for(int iTrack = 0; iTrack < nprim; iTrack++){
         const StMuTrack* muTrack = StMuDst::primaryTracks(iTrack);
