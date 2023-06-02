@@ -285,17 +285,16 @@ void readMudst_upcjet(
       eta2D[trig_index][direction_index]->Fill(leading_eta, subleading_eta);
       phi2D[trig_index][direction_index]->Fill(leading_phi, subleading_phi);
       
-      cout << "size " << p1c.size() << endl;
-      // for(int ip=0;ip<p1c.size();ip++){
-      //   for(int jn=0;jn<p2c.size();jn++){
-      //     rho = p1c[ip]+p2c[jn];
-      //     double mass=rho.M();
-      //     double pt=rho.Pt();
-      //     h_rho_mass[trig_index][direction_index]->Fill(mass);
-      //     h_rho_pt[trig_index][direction_index]->Fill(pt);
+      for(int ip=0;ip<p1c.size();ip++){
+        for(int jn=0;jn<p2c.size();jn++){
+          rho = p1c[ip]+p2c[jn];
+          double mass=rho.M();
+          double pt=rho.Pt();
+          h_rho_mass[trig_index][direction_index]->Fill(mass);
+          h_rho_pt[trig_index][direction_index]->Fill(pt);
 
-      //   }
-      // }
+        }
+      }
       p1c.clear();
       p2c.clear();
     }
