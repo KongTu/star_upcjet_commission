@@ -41,6 +41,7 @@ void readMudst_upcjet(
   const int direction = 2;
   
   TH1F* hntrk[num_trgs][direction];
+  TH1F *hvtxz[num_trgs][direction];
   TH1F* htrketa[num_trgs][direction];
   TH1F *epdeta[num_trgs][direction];
   TH1F *zdcadc_east[num_trgs][direction];
@@ -52,9 +53,15 @@ void readMudst_upcjet(
   TH2F *vpdadc[num_trgs][direction];
   TH2F *epdadc[num_trgs][direction];
 
+  TH2F *pt2D[num_trgs][direction];
+  TH2F *eta2D[num_trgs][direction];
+  TH2F *phi2D[num_trgs][direction];
+
   for(int i=0;i<num_trgs;i++){
     for(int j=0;j<direction;j++){
       hntrk[i][j] = new TH1F(Form("hntrk_%d_%d",i,j),";N_{trk};counts",200,0,200);
+      //vertex z
+      hvtxz[i][j] = new TH1F(Form("hvtxz_%d_%d",i,j),";z;counts",200,-200,200);
       //track
       htrketa[i][j] = new TH1F(Form("htrketa_%d_%d",i,j),"#eta",100,-2.5,2.5);
       //epd
@@ -72,6 +79,12 @@ void readMudst_upcjet(
       vpdadc[i][j] = new TH2F(Form("vpdadc_%d_%d",i,j),";VPDE ADC; VPDW ADC;counts",256,0,4000,256,0,4000);
       //epd adc
       epdadc[i][j] = new TH2F(Form("epdadc_%d_%d",i,j),";EPDE ADC; EPDW ADC;counts",256,0,40000,256,0,40000);
+      //pt2D
+      pt2D[i][j] = new TH2F(Form("pt2D_%d_%d",i,j),";leading p_{T} (GeV/c); subleading p_{T} (GeV/c);counts",100,0,20,100,0,20);
+      //eta2D
+      eta2D[i][j] = new TH2F(Form("eta2D_%d_%d",i,j),";leading #eta; subleading #eta;counts",100,-3,3,100,-3,3);
+      //phi2D
+      phi2D[i][j] = new TH2F(Form("phi2D_%d_%d",i,j),";leading #phi; subleading #phi;counts",100,-3.14,3.14,100,-3.14,3.14);
     }
   }
 
@@ -98,6 +111,8 @@ void readMudst_upcjet(
     //vertex selections:
     if(!vertex) continue;
     TVector3 pRcVx(vertex->position().x(), vertex->position().y(), vertex->position().z());
+      hvtxz[trig_index][direction_index]->Fill(vertex->position().z());
+    if(TMath::Abs(vertex->position().z())>100) continue;
     //Tof or BEMC match
     if(vertex->nBTOFMatch()<1 && vertex->nBEMCMatch()<1)continue;
 
@@ -123,13 +138,19 @@ void readMudst_upcjet(
       // ZDC reqirement 1nXn
       int ZDCW=0;
       int ZDCE=0;
-      if(zdcadc_w >= 350){ZDCW=1;}
-      if(zdcadc_e >= 350){ZDCE=1;}
+      if(zdcadc_w >= 250){ZDCW=1;}
+      if(zdcadc_e >= 250){ZDCE=1;}
 
       //1) now decide direction based on BBC first.
       int direction_index=-1;
-      if(BBCE && !BBCW) direction_index=0;
-      if(!BBCE && BBCW) direction_index=1;
+      if(trig_index==0){//bar1 trigger both sides are valid
+        if(BBCE && !BBCW) direction_index=0;
+        if(!BBCE && BBCW) direction_index=1;
+      }
+      else{//rest only west or neither
+        if(!BBCE && !BBCW) direction_index=0;
+        if(!BBCE && BBCW) direction_index=1;
+      }
       if(direction_index<0) continue; //protection
 
       //2) filling ZDC distributions based on BBC configurations
@@ -139,8 +160,14 @@ void readMudst_upcjet(
       
       //3) now add ZDC to BBC requirements
       direction_index=-1;
-      if(BBCE && !BBCW && ZDCE && !ZDCW) direction_index=0;
-      if(!BBCE && BBCW && !ZDCE && ZDCW) direction_index=1;
+      if(trig_index==0){//bar1 trigger both sides are valid
+        if(BBCE && !BBCW && ZDCE && !ZDCW) direction_index=0;
+        if(!BBCE && BBCW && !ZDCE && ZDCW) direction_index=1;
+      }
+      else{//rest only west or neither
+        if(!BBCE && !BBCW && !ZDCE && !ZDCW) direction_index=0;
+        if(!BBCE && BBCW && !ZDCE && ZDCW) direction_index=1;
+      }
       if(direction_index<0) continue; //protection again
      
     /*********** EEMC ************/
@@ -193,9 +220,15 @@ void readMudst_upcjet(
       int notrks = vertex->noTracks();
       int nprim = StMuDst::numberOfPrimaryTracks();
       int nglob = StMuDst::numberOfGlobalTracks();
-      //Printf("ranking=%lg nutrks=%d nprim=%d notrks=%d nglob=%d\n", ranking, nutrks, nprim, notrks, nglob);
 
       int numtrk = 0;
+      double leading_pt=0.;
+      double leading_eta=0.;
+      double leading_phi=0.;
+      double subleading_pt=0.;
+      double subleading_eta=0.;
+      double subleading_phi=0.;
+
       for(int iTrack = 0; iTrack < nprim; iTrack++){
         const StMuTrack* muTrack = StMuDst::primaryTracks(iTrack);
         int id = muTrack->id();
@@ -205,12 +238,33 @@ void readMudst_upcjet(
         bool type = muTrack->type();
         bool flag = muTrack->flag();
         float pt = muTrack->pt();
-        if(pt<0.2)continue;
+        float phi= muTrack->phi();
         double eta = muTrack->eta();
+
+        if(pt<0.2)continue;
+        if(nhits<15)continue;
+
+        if(pt>leading_pt){
+          subleading_pt=leading_pt;
+          subleading_eta=leading_eta;
+          subleading_phi=leading_phi;
+
+          leading_pt=pt;
+          leading_eta=eta;
+          leading_phi=phi;
+        }
+        else if(pt>subleading_pt){
+          subleading_pt=pt;
+          subleading_eta=eta;
+          subleading_phi=phi;
+        }
         htrketa[trig_index][direction_index]->Fill(eta);
         numtrk++;
       }
       hntrk[trig_index][direction_index]->Fill(numtrk);
+      pt2D[trig_index][direction_index]->Fill(leading_pt, subleading_pt);
+      eta2D[trig_index][direction_index]->Fill(leading_eta, subleading_eta);
+      phi2D[trig_index][direction_index]->Fill(leading_phi, subleading_phi);
     }
   }
 
