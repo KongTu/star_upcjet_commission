@@ -235,7 +235,7 @@ void readMudst_upcjet(
       double subleading_eta=0.;
       double subleading_phi=0.;
 
-      TLorentzVector p1; TLorentzVector p2; TLorentzVector rho;
+      TLorentzVector p1(0,0,0,0); TLorentzVector p2(0,0,0,0); TLorentzVector rho(0,0,0,0);
       vector<TLorentzVector> p1c; vector<TLorentzVector> p2c;
 
       for(int iTrack = 0; iTrack < nprim; iTrack++){
@@ -282,13 +282,13 @@ void readMudst_upcjet(
       eta2D[trig_index][direction_index]->Fill(leading_eta, subleading_eta);
       phi2D[trig_index][direction_index]->Fill(leading_phi, subleading_phi);
     
-      for(unsigned ip=0;ip<p1c.size();ip++){
-        for(unsigned jn=0;jn<p2c.size();jn++){
+      for(int ip=0;ip<p1c.size();ip++){
+        for(int jn=0;jn<p2c.size();jn++){
           rho = p1c[ip]+p2c[jn];
           double mass=rho.M();
           double pt=rho.Pt();
           h_rho_mass[trig_index][direction_index]->Fill(mass);
-          h_rho_pt[trig_index][direction_index]->Fill(mass);
+          h_rho_pt[trig_index][direction_index]->Fill(pt);
 
         }
       }
