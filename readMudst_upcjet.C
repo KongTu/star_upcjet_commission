@@ -2,7 +2,7 @@
 #include <vector>
 const unsigned long nevents = 40000000;
 int commTriggerID[]={2,3,16,17,18,19,20};
-int prodTriggerID[]={900501,900502,900503,900504,900505,900506,900507};
+int prodTriggerID[]={900503,900505,900506,900507,900511,900512,900514};
 
 void readMudst_upcjet(
 	       const char* mudstfile = "/star/data12/reco/./production_AuAu_2023/ReversedFullField/dev/2023/148/24148005/st_upcjet_24148005_raw_0000009.MuDst.root", 
@@ -146,7 +146,7 @@ void readMudst_upcjet(
     
     for(int i=0;i<num_trgs;i++){
       int trig_index=-1;
-      if( mMuEvent->triggerIdCollection().nominal().isTrigger(commTriggerID[i]) ) trig_index=i;
+      if( mMuEvent->triggerIdCollection().nominal().isTrigger(prodTriggerID[i]) ) trig_index=i;
       if(trig_index<0) continue; //protection
 
       //1) now decide direction based on BBC first.
